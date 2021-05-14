@@ -59,7 +59,6 @@ namespace TemnijExt
         public static byte[] Decompress(this byte[] bytes) => GZip.Decompress(bytes);
 
         #endregion
-
         #region xNet
 
         /// <summary>
@@ -82,7 +81,6 @@ namespace TemnijExt
         }
 
         #endregion
-
         #region Collections
 
         /// <summary>
@@ -117,14 +115,14 @@ namespace TemnijExt
         #endregion
     }
 
-    public class FileCl // TODO: Crypting
+    public class FileCl
     {
         #region FIELDS
 
         /// <summary>
         /// Путь до файла (только получение)
         /// </summary>
-        public string Path { get; internal set; }
+        public string Path { get; set; }
         /// <summary>
         /// Работа с хешами
         /// </summary>
@@ -135,8 +133,12 @@ namespace TemnijExt
         /// </summary>
         public FileInfo Info { get; internal set; }
 
-        #endregion
+        /// <summary>
+        /// Шифрование файла
+        /// </summary>
+        public CryptingCl Crypting;
 
+        #endregion
         #region METHODS
 
         #region Base Methods
@@ -150,6 +152,7 @@ namespace TemnijExt
             Hashes = new HashesCl(path);
             Info = new FileInfo(path);
             Path = path;
+            Crypting = new CryptingCl(path) { file = this };
         }
 
         /// <summary>
@@ -362,7 +365,6 @@ namespace TemnijExt
         #endregion
 
         #endregion
-
         #region CLASSES
 
         public class HashesCl
@@ -422,9 +424,35 @@ namespace TemnijExt
                     return Convert.ToBase64String(sha.ComputeHash(stream));
             }
         }
+        public class CryptingCl
+        {
+            #region FIELDS
+
+            internal FileCl file;
+            internal string Path { get; set; }
+
+            #endregion
+            #region METHODS
+
+            public CryptingCl(string path)
+            {
+                Path = path;
+                file = Load(path);
+            }
+
+            public void EncryptFile(string key) => file.SetBytes(Encrypt(key));
+            public byte[] Encrypt(string key) => Cryptor.Get(key).Encrypt(file.Path);
+
+            public void DecryptFIle(string key) => file.SetBytes(Decrypt(key));
+            public byte[] Decrypt(string key) => Cryptor.Get(key).Decrypt(file.Path);
+
+            #endregion
+        }
 
         #endregion
     }
+
+    #region Extend Classes
 
     public static class GZip
     {
@@ -497,4 +525,74 @@ namespace TemnijExt
             }
         }
     }
+    /// <summary>
+    /// Crypto Module
+    /// </summary>
+    public class Cryptor
+    {
+        private readonly int[] _key;
+        private readonly int[] _inversedKey;
+
+        public static Cryptor Get(string key) => new Cryptor(key);
+
+        public Cryptor(string key)
+        {
+            var indexPairs = key
+                .Select((chr, idx1) => new { chr, idx1 })
+                .OrderBy(arg => arg.chr)
+                .Select((arg, idx2) =>
+                    new
+                    {
+                        arg.idx1,
+                        idx2
+                    })
+                .ToArray();
+
+            _key = indexPairs
+                .OrderBy(arg => arg.idx1)
+                .Select(arg => arg.idx2)
+                .ToArray();
+
+            _inversedKey = indexPairs
+                .OrderBy(arg => arg.idx2)
+                .Select(arg => arg.idx1)
+                .ToArray();
+        }
+
+        public byte[] Encrypt(string sourceFile) =>
+            EncryptDecrypt(sourceFile, _key);
+
+        public byte[] Decrypt(string sourceFile) => 
+            EncryptDecrypt(sourceFile, _inversedKey);
+
+        private static byte[] EncryptDecrypt(string sourceFile, int[] key)
+        {
+            var keyLength = key.Length;
+            var buffer1 = new byte[keyLength];
+            var buffer2 = new byte[keyLength];
+            using (var source = new FileStream(sourceFile, FileMode.Open))
+            using (var destination = new MemoryStream())
+            {
+                while (true)
+                {
+                    var read = source.Read(buffer1, 0, keyLength);
+                    if (read == 0)
+                        return destination.ToArray();
+                    else if (read < keyLength)
+                        for (int i = read; i < keyLength; i++)
+                            buffer1[i] = (byte)' ';
+
+                    for (var i = 0; i < keyLength; i++)
+                    {
+                        var idx = (i / keyLength * keyLength) + key[i % keyLength];
+                        buffer2[idx] = buffer1[i];
+                    }
+
+                    destination.Write(buffer2, 0, keyLength);
+                }
+            }
+        }
+    }
+
+    #endregion
 }
