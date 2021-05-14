@@ -81,6 +81,9 @@ namespace TemnijExt
                 buffer[j] = buffer[i];
             }
         }
+
+        public static byte[] Compress(this byte[] bytes) => GZip.Compress(bytes);
+        public static byte[] Decompress(this byte[] bytes) => GZip.Decompress(bytes);
     }
 
     public class FileCl
@@ -91,12 +94,16 @@ namespace TemnijExt
         /// Путь до файла (только получение)
         /// </summary>
         public string Path { get; }
-
+        /// <summary>
+        /// Работа с хешами
+        /// </summary>
         public HashesCl Hashes;
 
         #endregion
 
         #region METHODS
+
+        #region Base Methods
 
         /// <summary>
         /// Создаёт новый объект типа FileCl (внутр.)
@@ -144,48 +151,148 @@ namespace TemnijExt
             return Load(path);
         }
 
+        #endregion
+
+        #region Content (Base64)
+
+        /// <summary>
+        /// Получить Base64 файла
+        /// </summary>
+        /// <returns>Base64</returns>
         public string GetBase64String() => Convert.ToBase64String(GetBytes());
+        /// <summary>
+        /// Устанавливает контент файла из base64 строки
+        /// </summary>
+        /// <param name="base64">Base64-строка</param>
         public void SetBase64String(string base64) => SetBytes(Convert.FromBase64String(base64));
 
+        #endregion
+        #region Content (Bytes)
+
+        /// <summary>
+        /// Получить массив байтов файла
+        /// </summary>
+        /// <returns>Массив байтов файла</returns>
         public byte[] GetBytes() => File.ReadAllBytes(Path);
+        /// <summary>
+        /// Установить массив байтов в файл
+        /// </summary>
+        /// <param name="bytes">Байты</param>
         public void SetBytes(byte[] bytes) => File.WriteAllBytes(Path, bytes);
+        /// <summary>
+        /// Установить массив байтов в файл
+        /// </summary>
+        /// <param name="bytes">Байты</param>
         public void SetBytes(IEnumerable<byte> bytes) => File.WriteAllBytes(Path, bytes.ToArray());
 
+        #endregion
+        #region Content (string)
+
+        /// <summary>
+        /// Получить контент файла, как <c>string</c>
+        /// </summary>
+        /// <returns>Контент файла</returns>
         public string GetContent() => File.ReadAllText(Path);
+        /// <summary>
+        /// Записать строку, как весь файл
+        /// </summary>
         public void SetContent(string content) => File.WriteAllText(Path, content);
 
+        #endregion
+        #region Content (Lines)
+
+        /// <summary>
+        /// Получить все строки файла
+        /// </summary>
+        /// <returns>Все строки файла</returns>
         public string[] GetLines() => File.ReadAllLines(Path);
+        /// <summary>
+        /// Записать как все строки файла
+        /// </summary>
+        /// <param name="lines"></param>
         public void SetLines(string[] lines) => File.WriteAllLines(Path, lines);
+        /// <summary>
+        /// Записать как все строки файла
+        /// </summary>
+        /// <param name="lines"></param>
         public void SetLines(IEnumerable<string> lines) => File.WriteAllLines(Path, lines);
+
+        #endregion
+
+        #region Overrides
 
         public override string ToString() => GetContent();
         public bool Equals(FileCl obj) => Hashes.GetCRC32() == obj.Hashes.GetCRC32();
 
-        #region Appends
+        #endregion
 
+        #region Appends
+        
+        /// <summary>
+        /// Дописать текст
+        /// </summary>
+        /// <param name="text"></param>
         public void AppendText(string text) => File.AppendAllText(Path, text);
+
+        /// <summary>
+        /// Добавить байты
+        /// </summary>
+        /// <param name="bytes"></param>
         public void AppendBytes(byte[] bytes)
         {
             using (var stream = new FileStream(Path, FileMode.Append))
                 stream.Write(bytes, 0, bytes.Length);
         }
-        public void AppendBytes(IEnumerable<byte> bytes)
-        {
-            using (var stream = new FileStream(Path, FileMode.Append))
-                stream.Write(bytes.ToArray(), 0, bytes.Count());
-        }
+        /// <summary>
+        /// Добавить байты
+        /// </summary>
+        /// <param name="bytes"></param>
+        public void AppendBytes(IEnumerable<byte> bytes) => AppendBytes(bytes.ToArray());
+
+        /// <summary>
+        /// Добавить строки
+        /// </summary>
+        /// <param name="lines"></param>
         public void AppendLines(string[] lines) => File.AppendAllLines(Path, lines);
+        /// <summary>
+        /// Добавить строки
+        /// </summary>
+        /// <param name="lines"></param>
         public void AppendLines(IEnumerable<string> lines) => File.AppendAllLines(Path, lines);
 
         #endregion
 
         #region GZip
 
+        /// <summary>
+        /// Компрессирование с помощью GZip
+        /// </summary>
+        /// <returns>Скомпрессированный файл в base64</returns>
         public string CompressB64() => GZip.Compress(GetContent());
+        /// <summary>
+        /// Декомпрессирование из base64 c помощью GZip
+        /// </summary>
+        /// <param name="b64">Base64</param>
+        /// <returns>Декомпрессированный контент</returns>
         public string DecompressB64(string b64) => GZip.Decompress(b64);
 
+        /// <summary>
+        /// Компрессирование с помощью GZip
+        /// (рекомендую с байтами (то есть этот метод), а не с base64)
+        /// </summary>
+        /// <returns>Скомпрессированный файл</returns>
         public byte[] Compress() => GZip.Compress(GetBytes());
+        /// <summary>
+        /// Декомпрессирование c помощью GZip
+        /// </summary>
+        /// <param name="bytes">Скомпрессированный массив байтов</param>
+        /// <returns>Декомпрессированный массив байтов</returns>
         public byte[] Decompress(byte[] bytes) => GZip.Decompress(bytes);
+        /// <summary>
+        /// Декомпрессирование c помощью GZip
+        /// </summary>
+        /// <param name="bytes">Скомпрессированный массив байтов</param>
+        /// <returns>Декомпрессированный массив байтов</returns>
         public byte[] Decompress(IEnumerable<byte> bytes) => Decompress(bytes.ToArray());
 
         #endregion
