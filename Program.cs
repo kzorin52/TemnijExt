@@ -117,7 +117,7 @@ namespace TemnijExt
         #endregion
     }
 
-    public class FileCl // TODO: Rename
+    public class FileCl // TODO: Crypting
     {
         #region FIELDS
 
@@ -129,6 +129,11 @@ namespace TemnijExt
         /// Работа с хешами
         /// </summary>
         public HashesCl Hashes;
+
+        /// <summary>
+        /// Инфа файла
+        /// </summary>
+        public FileInfo Info { get; internal set; }
 
         #endregion
 
@@ -143,6 +148,7 @@ namespace TemnijExt
         internal FileCl(string path)
         {
             Hashes = new HashesCl(path);
+            Info = new FileInfo(path);
             Path = path;
         }
 
@@ -183,16 +189,31 @@ namespace TemnijExt
         }
 
         #endregion
-
         #region Base File Methods
 
+        /// <summary>
+        /// Удаляет файл
+        /// </summary>
         public void Delete() => File.Delete(Path);
+        /// <summary>
+        /// Копирует файл
+        /// </summary>
+        /// <param name="newPath">Местоположение копии файла (с расширением и именем!)</param>
         public void Copy(string newPath) => File.Copy(Path, newPath);
+        /// <summary>
+        /// Перемещает файл
+        /// </summary>
+        /// <param name="newPath">Новое местоположение файла (с расширением и именем!)</param>
         public void Move(string newPath)
         {
             File.Move(Path, newPath);
             Path = newPath;
         }
+        /// <summary>
+        /// Переименовать
+        /// </summary>
+        /// <param name="newName">Новое имя (с расширением)</param>
+        public void Rename(string newName) => Info.MoveTo(Info.Directory.FullName + "\\" + newName);
 
         #endregion
 
