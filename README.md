@@ -12,6 +12,12 @@ FileCl - это класс-обёртка для файлов.
 ```cs
 var file = FileCl.Load(@"c:\file.exe");
 ```
+или
+
+```cs
+var file = FileCl.Create(@"c:\file2.exe");
+```
+
 Потом с файлом можно делать что угодно: <br>
 -	Копировать  `file.Copy(@"c:\file2.exe");`
 -	Перемеcтить `file.Move(@"c:\file2.exe");`
