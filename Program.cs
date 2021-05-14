@@ -12,16 +12,10 @@ using System.Text;
 
 namespace TemnijExt
 {
-    internal static class Program
-    {
-        private static void Main()
-        {
-            Console.WriteLine(FileCl.Load(@"D:\Downloads\Windows10_InsiderPreview_Client_x64_ru-ru_21354.iso").Hashes.GetSHA256());
-        }
-    }
-
     public static class Ext
     {
+        #region Archives
+
         /// <summary>
         /// Распаковывает архив в указанную директорию
         /// </summary>
@@ -33,6 +27,12 @@ namespace TemnijExt
             foreach (var entry in archive.Entries)
                 entry.WriteToDirectory(path, new ExtractionOptions() { ExtractFullPath = true, Overwrite = overwrite });
         }
+        /// <summary>
+        /// Массив файлов в архив
+        /// </summary>
+        /// <param name="files">Массив файлов</param>
+        /// <param name="archivePath">Путь до нового архива</param>
+        /// <param name="type">Тип архива</param>
         public static void ToArchive(this FileCl[] files, string archivePath, ArchiveType type = ArchiveType.Zip)
         {
             using (var zip = File.OpenWrite(archivePath))
@@ -44,7 +44,29 @@ namespace TemnijExt
                 }
             }
         }
+        
+        /// <summary>
+        /// Компресс массива байтов
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns>Скомпрессированные байты</returns>
+        public static byte[] Compress(this byte[] bytes) => GZip.Compress(bytes);
+        /// <summary>
+        /// Декомпресс массива байтов
+        /// </summary>
+        /// <param name="bytes">Скомпрессированные байты</param>
+        /// <returns>Декомпрессированный массив байтов</returns>
+        public static byte[] Decompress(this byte[] bytes) => GZip.Decompress(bytes);
 
+        #endregion
+
+        #region xNet
+
+        /// <summary>
+        /// Получить Raw-ответ (beta)
+        /// </summary>
+        /// <param name="resp">Ответ сервера</param>
+        /// <returns>Raw-ответ</returns>
         public static string Raw(this HttpResponse resp)
         {
             var raw = "";
@@ -59,6 +81,16 @@ namespace TemnijExt
             return raw;
         }
 
+        #endregion
+
+        #region Collections
+
+        /// <summary>
+        /// Перемешать коллекцию
+        /// </summary>
+        /// <typeparam name="T">Тип</typeparam>
+        /// <param name="source">Коллекция</param>
+        /// <returns>Перемешанная коллекция</returns>
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
         {
             return source.Shuffle(new Random());
@@ -82,8 +114,7 @@ namespace TemnijExt
             }
         }
 
-        public static byte[] Compress(this byte[] bytes) => GZip.Compress(bytes);
-        public static byte[] Decompress(this byte[] bytes) => GZip.Decompress(bytes);
+        #endregion
     }
 
     public class FileCl
