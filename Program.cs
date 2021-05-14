@@ -44,7 +44,7 @@ namespace TemnijExt
                 }
             }
         }
-        
+
         /// <summary>
         /// Компресс массива байтов
         /// </summary>
@@ -117,14 +117,14 @@ namespace TemnijExt
         #endregion
     }
 
-    public class FileCl
+    public class FileCl // TODO: Rename
     {
         #region FIELDS
 
         /// <summary>
         /// Путь до файла (только получение)
         /// </summary>
-        public string Path { get; }
+        public string Path { get; internal set; }
         /// <summary>
         /// Работа с хешами
         /// </summary>
@@ -180,6 +180,18 @@ namespace TemnijExt
             if (content != null)
                 File.WriteAllBytes(path, content);
             return Load(path);
+        }
+
+        #endregion
+
+        #region Base File Methods
+
+        public void Delete() => File.Delete(Path);
+        public void Copy(string newPath) => File.Copy(Path, newPath);
+        public void Move(string newPath)
+        {
+            File.Move(Path, newPath);
+            Path = newPath;
         }
 
         #endregion
@@ -258,7 +270,7 @@ namespace TemnijExt
         #endregion
 
         #region Appends
-        
+
         /// <summary>
         /// Дописать текст
         /// </summary>
