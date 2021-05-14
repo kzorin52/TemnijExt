@@ -434,11 +434,8 @@ namespace TemnijExt
             #endregion
             #region METHODS
 
-            public CryptingCl(string path)
-            {
+            public CryptingCl(string path) =>
                 Path = path;
-                file = Load(path);
-            }
 
             public void EncryptFile(string key) => file.SetBytes(Encrypt(key));
             public byte[] Encrypt(string key) => Cryptor.Get(key).Encrypt(file.Path);
