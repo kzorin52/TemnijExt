@@ -42,6 +42,7 @@ var file = FileCl.Create(@"c:\file2.exe");
 -	- SHA-512 `file.Hashes.GetSHA512();`
 - - MD5 `file.Hashes.GetMD5();`
 -	Получить метаданные файла классом `FileInfo` (время создания, папку, содержащую файл, расширение и т.д.)
+-	Сериализировать контент файла, как Json `using TemnijExt.AsJson; ... file.Serialize()["date"].ToString();`
 <br>
 Это правда удобно, вот посмотрите!<br>
 
