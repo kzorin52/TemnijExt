@@ -1,4 +1,5 @@
 ﻿using Leaf.xNet;
+using Newtonsoft.Json.Linq;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers;
@@ -452,6 +453,15 @@ namespace TemnijExt
         #endregion
     }
 
+    #region Extensions
+
+    public static class AsJSON
+    {
+        public static JObject Serialize(this FileCl file) => JObject.Parse(file.GetContent());
+    }
+
+    #endregion
+
     #region Extend Classes
 
     public static class GZip
@@ -562,7 +572,7 @@ namespace TemnijExt
         public byte[] Encrypt(string sourceFile) =>
             EncryptDecrypt(sourceFile, _key);
 
-        public byte[] Decrypt(string sourceFile) => 
+        public byte[] Decrypt(string sourceFile) =>
             EncryptDecrypt(sourceFile, _inversedKey);
 
         private static byte[] EncryptDecrypt(string sourceFile, int[] key)
