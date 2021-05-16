@@ -234,7 +234,7 @@ namespace TemnijExt
         /// Устанавливает контент файла из base64 строки
         /// </summary>
         /// <param name="base64">Base64-строка</param>
-        public void SetBase64String(string base64) => SetBytes(Convert.FromBase64String(base64));
+        public void SetBase64String(string base64) => SetContent(Convert.FromBase64String(base64));
 
         #endregion
         #region Content (Bytes)
@@ -248,12 +248,12 @@ namespace TemnijExt
         /// Установить массив байтов в файл
         /// </summary>
         /// <param name="bytes">Байты</param>
-        public void SetBytes(byte[] bytes) => File.WriteAllBytes(Path, bytes);
+        public void SetContent(byte[] bytes) => File.WriteAllBytes(Path, bytes);
         /// <summary>
         /// Установить массив байтов в файл
         /// </summary>
         /// <param name="bytes">Байты</param>
-        public void SetBytes(IEnumerable<byte> bytes) => File.WriteAllBytes(Path, bytes.ToArray());
+        public void SetContent(IEnumerable<byte> bytes) => File.WriteAllBytes(Path, bytes.ToArray());
 
         #endregion
         #region Content (string)
@@ -280,12 +280,12 @@ namespace TemnijExt
         /// Записать как все строки файла
         /// </summary>
         /// <param name="lines"></param>
-        public void SetLines(string[] lines) => File.WriteAllLines(Path, lines);
+        public void SetContent(string[] lines) => File.WriteAllLines(Path, lines);
         /// <summary>
         /// Записать как все строки файла
         /// </summary>
         /// <param name="lines"></param>
-        public void SetLines(IEnumerable<string> lines) => File.WriteAllLines(Path, lines);
+        public void SetContent(IEnumerable<string> lines) => File.WriteAllLines(Path, lines);
 
         #endregion
 
@@ -302,13 +302,13 @@ namespace TemnijExt
         /// Дописать текст
         /// </summary>
         /// <param name="text"></param>
-        public void AppendText(string text) => File.AppendAllText(Path, text);
+        public void Append(string text) => File.AppendAllText(Path, text);
 
         /// <summary>
         /// Добавить байты
         /// </summary>
         /// <param name="bytes"></param>
-        public void AppendBytes(byte[] bytes)
+        public void Append(byte[] bytes)
         {
             using (var stream = new FileStream(Path, FileMode.Append))
                 stream.Write(bytes, 0, bytes.Length);
@@ -317,18 +317,18 @@ namespace TemnijExt
         /// Добавить байты
         /// </summary>
         /// <param name="bytes"></param>
-        public void AppendBytes(IEnumerable<byte> bytes) => AppendBytes(bytes.ToArray());
+        public void Append(IEnumerable<byte> bytes) => Append(bytes.ToArray());
 
         /// <summary>
         /// Добавить строки
         /// </summary>
         /// <param name="lines"></param>
-        public void AppendLines(string[] lines) => File.AppendAllLines(Path, lines);
+        public void Append(string[] lines) => File.AppendAllLines(Path, lines);
         /// <summary>
         /// Добавить строки
         /// </summary>
         /// <param name="lines"></param>
-        public void AppendLines(IEnumerable<string> lines) => File.AppendAllLines(Path, lines);
+        public void Append(IEnumerable<string> lines) => File.AppendAllLines(Path, lines);
 
         #endregion
 
