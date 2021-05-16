@@ -440,10 +440,10 @@ namespace TemnijExt
             public CryptingCl(string path) =>
                 Path = path;
 
-            public void EncryptFile(string key) => file.SetBytes(Encrypt(key));
+            public void EncryptFile(string key) => file.SetContent(Encrypt(key));
             public byte[] Encrypt(string key) => Cryptor.Get(key).Encrypt(file.Path);
 
-            public void DecryptFIle(string key) => file.SetBytes(Decrypt(key));
+            public void DecryptFIle(string key) => file.SetContent(Decrypt(key));
             public byte[] Decrypt(string key) => Cryptor.Get(key).Decrypt(file.Path);
 
             #endregion
